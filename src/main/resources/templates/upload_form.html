@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto"/>
+    <link rel="stylesheet" type="text/css" media="all"
+          href="../../css/main.css"
+          data-th-href="@{/css/main.css}" />
+    <title>Cloud Storage</title>
+</head>
+<body>
+
+<div class="grid-container">
+
+    <div class="message-item" th:if="${message}">
+        <h2 th:text="${message}">Пусто</h2>
+    </div>
+
+    <div class="input-form-item">
+        <form method="POST" enctype="multipart/form-data" action="#" data-th-action="@{/upload}">
+            <input type="submit" value="Загрузить"/>
+            <input type="file" name="file"/>
+        </form>
+    </div>
+
+    <div class="list-item">
+        <ul>
+            <li th:each="file : ${files}">
+                <a th:href="${file.getPath()}" th:text="${file.getPathSegments().get(1)}"></a>
+            </li>
+        </ul>
+    </div>
+
+</div>
+
+</body>
+</html>

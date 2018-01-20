@@ -1,0 +1,10 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: 2048MB
+      max-request-size: 2048MB
+
+hvits3rk:
+  mongo:
+    address: 127.0.0.1
+    database: hvits3rk-mongodb
