@@ -1,7 +1,7 @@
 package com.romantupikov.cloudstorage.controllers;
 
 import com.romantupikov.cloudstorage.model.Account;
-import com.romantupikov.cloudstorage.repositories.AccountRepository;
+import com.romantupikov.cloudstorage.services.AccountService;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,16 +10,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Controller
 public class RegisterController {
 
-    private final AccountRepository accountRepository;
+    private final AccountService accountService;
 
-    public RegisterController(AccountRepository accountRepository) {
-        this.accountRepository = accountRepository;
+    public RegisterController(AccountService accountService) {
+        this.accountService = accountService;
     }
 
     @GetMapping("/register")
     public String registerPage(Account account) {
 
-        return "register";
+        return "auth/register";
     }
 
     @PostMapping("/register")
@@ -28,7 +28,7 @@ public class RegisterController {
         System.out.println(account);
         account.getRoles().add(new SimpleGrantedAuthority("USER"));
 
-        accountRepository.save(account);
+        accountService.save(account);
 
         return "redirect:/";
     }

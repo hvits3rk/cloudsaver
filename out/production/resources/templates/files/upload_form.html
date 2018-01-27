@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous"
+          th:href="@{/webjars/bootstrap/4.0.0/css/bootstrap.min.css}"/>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"
+            th:src="@{/webjars/jquery/3.2.1/jquery.min.js}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"
+            th:src="@{/webjars/popper.js/1.12.9/dist/popper.min.js}"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"
+            th:src="@{/webjars/bootstrap/4.0.0/js/bootstrap.min.js}"></script>
+
+    <title>Cloudsaver</title>
+</head>
+<body>
+
+<div class="container">
+    <div class="alert alert-primary" role="alert" th:if="${message}" th:text="${message}">
+        Ошибка.
+    </div>
+    <div class="row justify-content-md-center">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Загрузить файл</h5>
+                    <form method="post" enctype="multipart/form-data" action="#" th:action="@{/upload}">
+                        <div class="form-group">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="inputFile" name="file">
+                                <label class="custom-file-label" for="inputFile">Файл</label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary float-right">Загрузить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card">
+                <div th:each="file : ${files}" class="list-group">
+                    <a th:href="${file.getPath()}" href="#"
+                       class="list-group-item list-group-item-action flex-column align-items-start">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 th:text="${file.getPathSegments().get(1)}" class="mb-1">Filename.txt</h5>
+                            <small>3 дня назад</small>
+                        </div>
+                        <p class="mb-1">Размер файла например.</p>
+                    </a>
+                    <a th:remove="all" href="#"
+                       class="list-group-item list-group-item-action flex-column align-items-start">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">List group item heading</h5>
+                            <small class="text-muted">3 days ago</small>
+                        </div>
+                        <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus
+                            varius blandit.</p>
+                    </a>
+                    <a th:remove="all" href="#"
+                       class="list-group-item list-group-item-action flex-column align-items-start">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">List group item heading</h5>
+                            <small class="text-muted">3 days ago</small>
+                        </div>
+                        <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus
+                            varius blandit.</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -7,8 +7,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Account {
-    @Id
-    private String id;
 
     private String username;
 
@@ -22,14 +20,6 @@ public class Account {
     public Account(String username, String password) {
         this.username = username;
         this.password = password;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public String getUsername() {

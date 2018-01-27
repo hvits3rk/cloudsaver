@@ -32,7 +32,7 @@ public class MongoAuthProvider extends AbstractUserDetailsAuthenticationProvider
 
         Optional<Account> accountOptional = accountRepository.findByUsername(username);
 
-        if (accountOptional.isPresent()) {
+        if (accountOptional.isPresent() && accountOptional.get().getPassword().equals(authentication.getCredentials())) {
             Account account = accountOptional.get();
             loadedUser = new User(account.getUsername(), account.getPassword(), account.getRoles());
         } else {

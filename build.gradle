@@ -35,10 +35,9 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-web')
 	compile('org.springframework.boot:spring-boot-starter-security')
 	compile('org.springframework.security.oauth:spring-security-oauth2:2.2.1.RELEASE')
-	compile('org.webjars:jquery:3.2.1')
-	compile('org.webjars:bootstrap:4.0.0')
-    compile('org.webjars:js-cookie:2.1.0')
-	compile('org.webjars:webjars-locator')
+	compile 'org.webjars:jquery:3.2.1'
+	compile 'org.webjars.bower:popper.js:1.12.9'
+	compile 'org.webjars:bootstrap:4.0.0'
 	runtime('org.springframework.boot:spring-boot-devtools')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile('de.flapdoodle.embed:de.flapdoodle.embed.mongo')

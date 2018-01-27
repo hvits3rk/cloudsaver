@@ -20,7 +20,7 @@ public class LoginController {
     @GetMapping("/login")
     public String loginPage(Account account) {
 
-        return "login";
+        return "auth/login";
     }
 
     @PostMapping("/login")
@@ -31,6 +31,6 @@ public class LoginController {
             System.out.println(account);
         }
 
-        return "redirect:/login";
+        return "redirect:/upload";
     }
 }

@@ -22,7 +22,7 @@ public class GridFsTemplateConfig extends AbstractMongoConfiguration {
     }
 
     @Override
-    protected String getDatabaseName() {
+    public String getDatabaseName() {
         return mongoDatabase;
     }
 
