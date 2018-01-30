@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8"/>
 
@@ -33,7 +33,8 @@
                     <form action="#" data-th-action="@{/register}" data-th-object="${account}" method="post">
                         <div class="form-group">
                             <label for="registerEmail">Почта</label>
-                            <input type="email" th:field="*{username}" class="form-control" id="registerEmail" aria-describedby="emailHelp" placeholder="email@dom.com">
+                            <input type="email" th:field="*{username}" class="form-control" id="registerEmail"
+                                   aria-describedby="emailHelp" placeholder="email@dom.com">
                             <small id="emailHelp" class="form-text text-muted">Какое-нибудь предупреждение.</small>
                         </div>
                         <div class="form-group">

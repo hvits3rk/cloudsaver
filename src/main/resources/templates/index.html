@@ -1,6 +1,6 @@
 <!doctype html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<html xmlns:th="http://www.thymeleaf.org" lang="en" xmlns="http://www.w3.org/1999/xhtml"
+>
 <head>
     <meta charset="UTF-8"/>
 
@@ -31,7 +31,7 @@
     <hr class="my-4">
     <p>Загружай!</p>
     <p class="lead">
-        <a class="btn btn-primary btn-lg" href="#" th:action="@{/upload}" role="button">Загрузить файлы</a>
+        <a class="btn btn-primary btn-lg" href="#" th:href="@{/upload}" role="button">Загрузить файлы</a>
     </p>
 </div>
 

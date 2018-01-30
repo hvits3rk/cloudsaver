@@ -7,4 +7,4 @@ spring:
 hvits3rk:
   mongo:
     address: 127.0.0.1
-    database: hvits3rk-mongodb
+    database: cloudsaver

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8"/>
 
@@ -51,7 +51,7 @@
                     <a th:href="${file.getPath()}" href="#"
                        class="list-group-item list-group-item-action flex-column align-items-start">
                         <div class="d-flex w-100 justify-content-between">
-                            <h5 th:text="${file.getPathSegments().get(1)}" class="mb-1">Filename.txt</h5>
+                            <h5 th:text="${file}" class="mb-1">Filename.txt</h5>
                             <small>3 дня назад</small>
                         </div>
                         <p class="mb-1">Размер файла например.</p>

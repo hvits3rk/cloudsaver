@@ -1,65 +1,39 @@
 package com.romantupikov.cloudstorage.controllers;
 
-import com.romantupikov.cloudstorage.model.Account;
-import com.romantupikov.cloudstorage.repositories.AccountRepository;
 import com.romantupikov.cloudstorage.services.FileService;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.gridfs.GridFsCriteria;
-import org.springframework.data.mongodb.gridfs.GridFsOperations;
-import org.springframework.data.mongodb.gridfs.GridFsResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.UriComponents;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Optional;
+import java.util.List;
 
 @Controller
 public class FileUploadController {
 
     private final HttpServletRequest httpServletRequest;
-    private final GridFsOperations gridFsOperations;
-    private final AccountRepository accountRepository;
     private final FileService fileService;
 
-    public FileUploadController(GridFsOperations gridFsOperations,
-                                AccountRepository accountRepository,
-                                HttpServletRequest httpServletRequest,
+    public FileUploadController(HttpServletRequest httpServletRequest,
                                 FileService fileService) {
-        this.gridFsOperations = gridFsOperations;
-        this.accountRepository = accountRepository;
         this.httpServletRequest = httpServletRequest;
         this.fileService = fileService;
+        fileService.init();
     }
 
     @GetMapping("/upload")
     public String uploadPage(Model model) {
-        Optional<Account> accountOptional = accountRepository.findByUsername(httpServletRequest.getRemoteUser());
 
-        if (!accountOptional.isPresent()) {
-            return "files/upload_form";
-        }
+        List<UriComponents> uriComponents = fileService.getUriComponents();
 
-//        Query query = new Query(Criteria.where("metadata.owner").is(accountOptional.get().getId()));
-        Query query = new Query();
-
-        ArrayList<UriComponents> arrayList = gridFsOperations.find(query).map(
-                gridFSFile -> MvcUriComponentsBuilder.fromMethodName(FileUploadController.class,
-                        "downloadFile", gridFSFile.getFilename())
-                        .build())
-                .into(new ArrayList<>());
-
-        model.addAttribute("files", arrayList);
+        model.addAttribute("files", uriComponents);
 
         return "files/upload_form";
     }
@@ -82,16 +56,12 @@ public class FileUploadController {
 
     @RequestMapping(value = "/files/{filename:.+}", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseEntity<InputStreamResource> downloadFile(@PathVariable String filename) throws IOException {
+    public ResponseEntity<Resource> downloadFile(@PathVariable String filename) throws IOException {
 
-        GridFsResource file = fileService.getFileByOwnerAndFilename(httpServletRequest.getRemoteUser(), filename);
-
-        if (file == null)
-            return null;
+        Resource file = fileService.loadAsResource(filename);
 
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
                 "attachment; filename=\"" + file.getFilename() + "\"").body(file);
-
     }
 
 

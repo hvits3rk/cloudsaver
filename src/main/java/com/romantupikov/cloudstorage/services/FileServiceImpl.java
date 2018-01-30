@@ -1,76 +1,165 @@
 package com.romantupikov.cloudstorage.services;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import com.mongodb.client.gridfs.model.GridFSFile;
+import com.romantupikov.cloudstorage.controllers.FileUploadController;
 import com.romantupikov.cloudstorage.model.Account;
-import com.romantupikov.cloudstorage.repositories.AccountRepository;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.gridfs.GridFsCriteria;
-import org.springframework.data.mongodb.gridfs.GridFsOperations;
-import org.springframework.data.mongodb.gridfs.GridFsResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileSystemUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
+import org.springframework.web.util.UriComponents;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class FileServiceImpl implements FileService {
 
-    private final AccountRepository accountRepository;
-    private final GridFsOperations gridFsOperations;
+    private final Path rootLocation;
     private final HttpServletRequest httpServletRequest;
+    private final AccountService accountService;
 
-    public FileServiceImpl(AccountRepository accountRepository,
-                           GridFsOperations gridFsOperations,
-                           HttpServletRequest httpServletRequest) {
-        this.accountRepository = accountRepository;
-        this.gridFsOperations = gridFsOperations;
+    public FileServiceImpl(HttpServletRequest httpServletRequest, AccountService accountService) {
+        this.rootLocation = Paths.get("root");
         this.httpServletRequest = httpServletRequest;
+        this.accountService = accountService;
+        init();
     }
 
     @Override
-    public GridFsResource getFileByOwnerAndFilename(String owner, String filename) {
+    public void saveFile(MultipartFile file) {
+        String filename = StringUtils.cleanPath(file.getOriginalFilename());
+        try {
+            if (file.isEmpty()) {
+                throw new RuntimeException("Пустой файл");
+            }
+            if (filename.contains("..")) {
+                throw new RuntimeException("Файл содержит недопустимы символы " + filename);
+            }
 
-        Optional<Account> optionalAccount = accountRepository.findByUsername(owner);
-        if (!optionalAccount.isPresent()) {
-            return null;
-        }
+            Optional<Account> accountOptional = accountService.findByUsername(httpServletRequest.getRemoteUser());
 
-//        Query query = new Query(GridFsCriteria.whereMetaData("ownerId").is(optionalAccount.get().getId())
-//                .andOperator(GridFsCriteria.whereFilename().is(filename)));
+            if (!accountOptional.isPresent()) {
+                throw new RuntimeException("Аккаунт не найден");
+            }
 
-        Query query = new Query(GridFsCriteria.whereFilename().is(filename));
+            Account account = accountOptional.get();
 
-        GridFSFile gridFSFile = gridFsOperations.findOne(query);
+            Path path = Paths.get(account.getUsername(), filename);
 
-        if (gridFSFile != null) {
-            return gridFsOperations.getResource(filename);
-        } else {
-            return null;
+            initDirs(rootLocation.resolve(account.getUsername()));
+
+            Files.copy(file.getInputStream(), rootLocation.resolve(path),
+                    StandardCopyOption.REPLACE_EXISTING);
+
+            account.addFile(filename);
+            accountService.save(account);
+
+        } catch (IOException e) {
+            throw new RuntimeException("Не получилось сохранить файл " + filename, e);
         }
     }
 
     @Override
-    public boolean saveFile(MultipartFile file) throws IOException {
+    public Stream<String> loadAll() {
 
-        Optional<Account> accountOptional = accountRepository.findByUsername(httpServletRequest.getRemoteUser());
+        Optional<Account> accountOptional = accountService.findByUsername(httpServletRequest.getRemoteUser());
 
-//        String ownerId = accountOptional.get().getId();
+        if (!accountOptional.isPresent()) {
+            throw new RuntimeException("Аккаунт не найден");
+        }
 
-        String fileType = file.getContentType();
-        String fileName = file.getOriginalFilename();
+        Account account = accountOptional.get();
 
-        DBObject metaData = new BasicDBObject();
-        metaData.put("originalName", fileName);
-//        metaData.put("ownerId", ownerId);
+        Stream<String> pathStream = account.getFiles().stream();
 
-        InputStream fileStream = file.getInputStream();
-        gridFsOperations.store(fileStream, fileName, fileType, metaData);
-
-        return true;
+        return pathStream;
     }
+
+    @Override
+    public List<UriComponents> getUriComponents() {
+
+        return loadAll().map(
+                path -> MvcUriComponentsBuilder.fromMethodName(FileUploadController.class,
+                        "downloadFile", path).build())
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public Resource loadAsResource(String filename) {
+        Optional<Account> accountOptional = accountService.findByUsername(httpServletRequest.getRemoteUser());
+
+        System.out.println("loadAsResource(): " + filename);
+
+        if (!accountOptional.isPresent()) {
+            throw new RuntimeException("Аккаунт не найден");
+        }
+
+        Account account = accountOptional.get();
+
+        try {
+            Optional<String> fileOptional = account.getFiles().stream()
+                    .filter(file -> file.equals(filename))
+                    .findFirst();
+
+            if (!fileOptional.isPresent()) {
+                throw new RuntimeException("Файл не найден: " + filename);
+            }
+
+            Path file = rootLocation.resolve(Paths.get(account.getUsername(), fileOptional.get()));
+
+            System.out.println("file path: " + file);
+
+            Resource resource = new UrlResource(file.toUri());
+
+            if (resource.exists() || resource.isReadable()) {
+                return resource;
+            } else {
+                throw new RuntimeException("Не получилось прочитать: " + filename);
+
+            }
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Не получилось прочитать: " + filename, e);
+        }
+    }
+
+    @Override
+    public void deleteAll() {
+        FileSystemUtils.deleteRecursively(rootLocation.toFile());
+    }
+
+    @Override
+    public void init() {
+        try {
+            Files.createDirectories(rootLocation);
+        } catch (IOException e) {
+            throw new RuntimeException("Не получилось инициализировать рут директорию", e);
+        }
+    }
+
+    private void initDirs(Path path) {
+        try {
+            Files.createDirectories(path);
+        } catch (IOException e) {
+            throw new RuntimeException("Не получилось инициализироватьдиректорию", e);
+        }
+    }
+
+//    private String generageChecksum(MultipartFile file) throws NoSuchAlgorithmException, IOException {
+//        MessageDigest md = MessageDigest.getInstance("MD5");
+//        md.update(file.getBytes());
+//        byte[] digest = md.digest();
+//        return DatatypeConverter.printHexBinary(digest).toUpperCase();
+//    }
 }

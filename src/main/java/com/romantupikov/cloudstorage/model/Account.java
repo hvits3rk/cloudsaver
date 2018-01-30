@@ -8,9 +8,14 @@ import java.util.Set;
 
 public class Account {
 
+    @Id
+    private String id;
+
     private String username;
 
     private String password;
+
+    private Set<String> files = new HashSet<>();
 
     private Set<GrantedAuthority> roles = new HashSet<>();
 
@@ -46,12 +51,32 @@ public class Account {
         this.roles = roles;
     }
 
+    public void addFile(String path) {
+        files.add(path);
+    }
+
+    public Set<String> getFiles() {
+        return files;
+    }
+
+    public void setFiles(Set<String> files) {
+        this.files = files;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
         return "Account{" +
                 "username='" + username + '\'' +
                 ", password='" + password + '\'' +
-                ", roles=" + roles +
+                ", roles=" + roles.toString() +
                 '}';
     }
 }
