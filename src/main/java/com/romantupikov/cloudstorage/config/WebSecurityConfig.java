@@ -1,6 +1,6 @@
 package com.romantupikov.cloudstorage.config;
 
-import com.romantupikov.cloudstorage.services.MongoAuthProvider;
+import com.romantupikov.cloudstorage.services.AuthProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -12,10 +12,10 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final MongoAuthProvider mongoAuthProvider;
+    private final AuthProvider authProvider;
 
-    public WebSecurityConfig(MongoAuthProvider mongoAuthProvider) {
-        this.mongoAuthProvider = mongoAuthProvider;
+    public WebSecurityConfig(AuthProvider authProvider) {
+        this.authProvider = authProvider;
     }
 
     @Override
@@ -35,6 +35,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.authenticationProvider(mongoAuthProvider);
+        auth.authenticationProvider(authProvider);
     }
 }

@@ -1,14 +1,21 @@
 package com.romantupikov.cloudstorage.services;
 
 import com.romantupikov.cloudstorage.model.Account;
+import com.romantupikov.cloudstorage.model.form.AccountForm;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface AccountService {
+    List<Account> listAll();
 
-    void save(Account account);
+    Account getById(String id);
 
-    Optional<Account> findByUsername(String username);
+    Account getByUsername(String username);
 
-    Optional<Account> getCurrentUser();
+    Account saveOrUpdate(Account account);
+
+    void delete(String id);
+
+    Account saveOrUpdateAccountForm(AccountForm accountForm);
 }

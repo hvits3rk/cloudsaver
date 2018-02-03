@@ -1,11 +1,15 @@
 package com.romantupikov.cloudstorage.controllers;
 
 import com.romantupikov.cloudstorage.model.Account;
+import com.romantupikov.cloudstorage.model.form.AccountForm;
 import com.romantupikov.cloudstorage.services.AccountService;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+
+import javax.validation.Valid;
 
 @Controller
 public class RegisterController {
@@ -17,18 +21,20 @@ public class RegisterController {
     }
 
     @GetMapping("/register")
-    public String registerPage(Account account) {
+    public String registerPage(AccountForm accountForm) {
 
         return "auth/register";
     }
 
     @PostMapping("/register")
-    public String registerUser(Account account) {
+    public String registerUser(@Valid AccountForm accountForm, BindingResult bindingResult) {
 
-        System.out.println(account);
-        account.getRoles().add(new SimpleGrantedAuthority("USER"));
+        if (bindingResult.hasErrors()) {
+            return "auth/register";
+        }
 
-        accountService.save(account);
+        accountForm.getGrantedAuthorities().add(new SimpleGrantedAuthority("USER"));
+        accountService.saveOrUpdateAccountForm(accountForm);
 
         return "redirect:/";
     }

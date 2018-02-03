@@ -11,19 +11,15 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.util.UriComponents;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
 
 @Controller
 public class FileUploadController {
 
-    private final HttpServletRequest httpServletRequest;
     private final FileService fileService;
 
-    public FileUploadController(HttpServletRequest httpServletRequest,
-                                FileService fileService) {
-        this.httpServletRequest = httpServletRequest;
+    public FileUploadController(FileService fileService) {
         this.fileService = fileService;
         fileService.init();
     }
@@ -42,7 +38,7 @@ public class FileUploadController {
     public String uploadFile(@RequestParam("file") MultipartFile file,
                              RedirectAttributes redirectAttributes) throws IOException {
 
-        fileService.saveFile(file);
+        fileService.saveOrUpdate(file);
 
         String fileName = file.getOriginalFilename();
         float fileSizeMB = (file.getSize() / 1024f) / 1024f;
@@ -58,7 +54,7 @@ public class FileUploadController {
     @ResponseBody
     public ResponseEntity<Resource> downloadFile(@PathVariable String filename) throws IOException {
 
-        Resource file = fileService.loadAsResource(filename);
+        Resource file = fileService.getAsResource(filename);
 
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
                 "attachment; filename=\"" + file.getFilename() + "\"").body(file);

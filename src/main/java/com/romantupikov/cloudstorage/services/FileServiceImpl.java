@@ -38,8 +38,9 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public void saveFile(MultipartFile file) {
+    public MultipartFile saveOrUpdate(MultipartFile file) {
         String filename = StringUtils.cleanPath(file.getOriginalFilename());
+
         try {
             if (file.isEmpty()) {
                 throw new RuntimeException("Пустой файл");
@@ -48,13 +49,7 @@ public class FileServiceImpl implements FileService {
                 throw new RuntimeException("Файл содержит недопустимы символы " + filename);
             }
 
-            Optional<Account> accountOptional = accountService.findByUsername(httpServletRequest.getRemoteUser());
-
-            if (!accountOptional.isPresent()) {
-                throw new RuntimeException("Аккаунт не найден");
-            }
-
-            Account account = accountOptional.get();
+            Account account = accountService.getByUsername(httpServletRequest.getRemoteUser());
 
             Path path = Paths.get(account.getUsername(), filename);
 
@@ -64,23 +59,19 @@ public class FileServiceImpl implements FileService {
                     StandardCopyOption.REPLACE_EXISTING);
 
             account.addFile(filename);
-            accountService.save(account);
+            accountService.saveOrUpdate(account);
 
         } catch (IOException e) {
             throw new RuntimeException("Не получилось сохранить файл " + filename, e);
         }
+
+        return file;
     }
 
     @Override
-    public Stream<String> loadAll() {
+    public Stream<String> listAll() {
 
-        Optional<Account> accountOptional = accountService.findByUsername(httpServletRequest.getRemoteUser());
-
-        if (!accountOptional.isPresent()) {
-            throw new RuntimeException("Аккаунт не найден");
-        }
-
-        Account account = accountOptional.get();
+        Account account = accountService.getByUsername(httpServletRequest.getRemoteUser());
 
         Stream<String> pathStream = account.getFiles().stream();
 
@@ -90,23 +81,15 @@ public class FileServiceImpl implements FileService {
     @Override
     public List<UriComponents> getUriComponents() {
 
-        return loadAll().map(
+        return listAll().map(
                 path -> MvcUriComponentsBuilder.fromMethodName(FileUploadController.class,
                         "downloadFile", path).build())
                 .collect(Collectors.toList());
     }
 
     @Override
-    public Resource loadAsResource(String filename) {
-        Optional<Account> accountOptional = accountService.findByUsername(httpServletRequest.getRemoteUser());
-
-        System.out.println("loadAsResource(): " + filename);
-
-        if (!accountOptional.isPresent()) {
-            throw new RuntimeException("Аккаунт не найден");
-        }
-
-        Account account = accountOptional.get();
+    public Resource getAsResource(String filename) {
+        Account account = accountService.getByUsername(httpServletRequest.getRemoteUser());
 
         try {
             Optional<String> fileOptional = account.getFiles().stream()

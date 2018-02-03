@@ -9,18 +9,15 @@ import java.util.stream.Stream;
 
 public interface FileService {
 
-    //    GridFsResource getFileByOwnerAndFilename(String owner, String filename);
-//
-    void saveFile(MultipartFile file);
-
-    //
-    List<UriComponents> getUriComponents();
-
     void init();
 
-    Stream<String> loadAll();
+    MultipartFile saveOrUpdate(MultipartFile file);
 
-    Resource loadAsResource(String filename);
+    List<UriComponents> getUriComponents();
+
+    Stream<String> listAll();
+
+    Resource getAsResource(String filename);
 
     void deleteAll();
 }
