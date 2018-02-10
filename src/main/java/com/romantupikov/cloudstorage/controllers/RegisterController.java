@@ -30,13 +30,6 @@ public class RegisterController {
     @PostMapping("/register")
     public String registerUser(@Valid AccountForm accountForm, BindingResult bindingResult) {
 
-        if (accountService.getByUsername(accountForm.getUsername()) != null) {
-
-            bindingResult.addError(new ObjectError("username", "Аккаунт с таким именем уже есть!"));
-        }
-
-        System.out.println(bindingResult);
-
         if (bindingResult.hasErrors()) {
             return "auth/register";
         }

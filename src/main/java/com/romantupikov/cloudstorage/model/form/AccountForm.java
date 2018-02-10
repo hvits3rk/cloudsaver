@@ -1,6 +1,7 @@
 package com.romantupikov.cloudstorage.model.form;
 
 import com.romantupikov.cloudstorage.constraint.PasswordMatches;
+import com.romantupikov.cloudstorage.constraint.UniqueUsername;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.validation.constraints.*;
@@ -8,6 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @PasswordMatches
+@UniqueUsername
 public class AccountForm {
 
     private String id;
