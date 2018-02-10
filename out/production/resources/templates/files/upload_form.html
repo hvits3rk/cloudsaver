@@ -25,59 +25,55 @@
 <body>
 
 <div class="container" style="margin-top: 25px">
-    <div class="alert alert-primary" role="alert" th:if="${message}" th:text="${message}">
+    <div class="alert alert-warning" role="alert" th:if="${message}" th:text="${message}">
         Ошибка.
     </div>
-    <div class="row justify-content-md-center">
-        <div class="col-md-4">
+
+    <div class="row">
+        <div class="col">
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Загрузить файл</h5>
-                    <form method="post" enctype="multipart/form-data" action="#" th:action="@{/upload}">
-                        <div class="form-group">
+                    <form class="form-inline" method="post" enctype="multipart/form-data" action="#"
+                          th:action="@{/upload}">
+                        <div class="form-group mx-sm-3 mb-2">
                             <div class="custom-file">
                                 <input type="file" class="custom-file-input" id="inputFile" name="file">
                                 <label class="custom-file-label" for="inputFile">Файл</label>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary float-right">Загрузить</button>
+                        <button type="submit" class="btn btn-primary mb-2">Загрузить</button>
                     </form>
                 </div>
             </div>
         </div>
-        <div class="col-md-8">
+    </div>
+
+    <div class="row">
+        <div class="col">
             <div class="card">
-                <div th:each="file : ${files}" class="list-group">
-                    <a th:href="${file.getPath()}" href="#"
-                       class="list-group-item list-group-item-action flex-column align-items-start">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h5 th:text="${file}" class="mb-1">Filename.txt</h5>
-                            <small>3 дня назад</small>
+                <div class="card-body">
+                    <div class="container">
+                        <div class="row">
+
+                            <div th:each="file : ${files}" class="col col-12 col-sm-12 col-md-6 col-lg-4 col-xl-3"
+                                 style="margin-bottom: 1rem;">
+                                <a th:href="${file.getPath()}" href="#">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="text-truncate" th:text="${file.getPathSegments().get(1)}">Filename.txt</h5>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+
                         </div>
-                        <p class="mb-1">Размер файла например.</p>
-                    </a>
-                    <a th:remove="all" href="#"
-                       class="list-group-item list-group-item-action flex-column align-items-start">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h5 class="mb-1">List group item heading</h5>
-                            <small class="text-muted">3 days ago</small>
-                        </div>
-                        <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus
-                            varius blandit.</p>
-                    </a>
-                    <a th:remove="all" href="#"
-                       class="list-group-item list-group-item-action flex-column align-items-start">
-                        <div class="d-flex w-100 justify-content-between">
-                            <h5 class="mb-1">List group item heading</h5>
-                            <small class="text-muted">3 days ago</small>
-                        </div>
-                        <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus
-                            varius blandit.</p>
-                    </a>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
 </div>
 
 </body>

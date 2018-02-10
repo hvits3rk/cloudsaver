@@ -135,7 +135,7 @@ public class FileServiceImpl implements FileService {
         try {
             Files.createDirectories(path);
         } catch (IOException e) {
-            throw new RuntimeException("Не получилось инициализироватьдиректорию", e);
+            throw new RuntimeException("Не получилось инициализировать директорию", e);
         }
     }
 
