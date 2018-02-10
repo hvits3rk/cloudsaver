@@ -20,6 +20,7 @@ public class PasswordMatchesValidator implements ConstraintValidator<PasswordMat
 
         if (!valid) {
             context.buildConstraintViolationWithTemplate("Пароли не совпадают")
+                    .addPropertyNode("password")
                     .addConstraintViolation()
                     .disableDefaultConstraintViolation();
         }

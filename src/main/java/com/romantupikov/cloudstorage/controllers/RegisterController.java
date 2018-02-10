@@ -6,6 +6,7 @@ import com.romantupikov.cloudstorage.services.AccountService;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -28,6 +29,13 @@ public class RegisterController {
 
     @PostMapping("/register")
     public String registerUser(@Valid AccountForm accountForm, BindingResult bindingResult) {
+
+        if (accountService.getByUsername(accountForm.getUsername()) != null) {
+
+            bindingResult.addError(new ObjectError("username", "Аккаунт с таким именем уже есть!"));
+        }
+
+        System.out.println(bindingResult);
 
         if (bindingResult.hasErrors()) {
             return "auth/register";
